@@ -18,9 +18,11 @@ The file names are hashed using MD5. Because the folder and file names are not c
 
 ## Getting Started
 
-First of all, you need to get [the latest release](https://github.com/timmyrs/Shark/releases) of Shark.
+1. Download [the latest release](https://github.com/timmyrs/Shark/releases) of Shark (`shark.jar`).
 
-Then you can try to start it using `java -jar shark.jar`. If you get an error somewhat related to `MajorMinorVersion`, that means you need to install Java 9.
+2. Try to start it using `java -jar shark.jar`.
+
+	1. If you get an error somewhat related to `MajorMinorVersion`, you need to install [Java 9](http://www.oracle.com/technetwork/java/javase/downloads/jre9-downloads-3848532.html).
 
 ### Browse a Repository
 
