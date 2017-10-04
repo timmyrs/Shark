@@ -32,7 +32,7 @@ public class SharkDirectory extends SharkFile
 						rawFile.get("name").getAsString(),
 						rawFile.get("type").getAsString(),
 						this.path + this.getRemoteName() + "/",
-						this.localpath + this.getLocalName() + "/",
+						this.localpath + this.getLocalName(),
 						(rawFile.has("use") ? rawFile.get("use").getAsString() : "")
 				));
 			}

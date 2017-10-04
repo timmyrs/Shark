@@ -200,7 +200,7 @@ public class SharkFile
 		return content;
 	}
 
-	public void recursiveDownload(String prepend, String localpath)
+	public void download(String prepend, String localpath)
 	{
 		try
 		{
@@ -209,7 +209,7 @@ public class SharkFile
 			{
 				for(SharkFile child : ((SharkDirectory) this).getChildren())
 				{
-					child.recursiveDownload(prepend + "  ", localpath + this.getLocalName());
+					child.download(prepend + "  ", localpath + this.getLocalName());
 				}
 			}
 			else
