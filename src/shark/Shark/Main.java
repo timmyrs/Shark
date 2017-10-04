@@ -1,9 +1,6 @@
 package shark.Shark;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import shark.Shark.files.SharkDirectory;
 import shark.Shark.files.SharkFile;
 
@@ -23,6 +20,7 @@ import java.util.Base64;
 
 public class Main
 {
+	public static Gson GSON = new Gson();
 	public static String REPOSITORY_URL;
 	public static SharkDirectory REPOSITORY;
 
@@ -294,7 +292,7 @@ public class Main
 					fileObj.addProperty("use", "aes-key");
 					array.add(fileObj);
 					OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile.getParentFile().getPath() + "/6a992d5529f459a44fee58c733255e86.bin"));
-					writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(array));
+					writer.write(Main.GSON.toJson(array));
 					writer.flush();
 					writer.close();
 					byte[] aesKey;
@@ -383,7 +381,7 @@ public class Main
 		SecretKeySpec key = new SecretKeySpec(aesKey, "AES");
 		cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec("AAAAAAAAAAAAAAAA".getBytes("UTF-8")));
 		OutputStreamWriter writer = new OutputStreamWriter(new CipherOutputStream(new FileOutputStream(new File(outputFile.getPath() + "/6a992d5529f459a44fee58c733255e86.bin")), cipher));
-		writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(array));
+		writer.write(Main.GSON.toJson(array));
 		writer.flush();
 		writer.close();
 		//noinspection ConstantConditions
