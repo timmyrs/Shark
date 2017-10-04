@@ -19,7 +19,7 @@ public class SharkDirectory extends SharkFile
 		index = SharkFile.construct("index", "json", this.path + this.getRemoteName() + "/", this.localpath + this.getLocalName() + "/", use);
 	}
 
-	public ArrayList<SharkFile> getChildren() throws SharkException
+	ArrayList<SharkFile> getChildren() throws SharkException
 	{
 		if(children == null)
 		{
@@ -69,5 +69,28 @@ public class SharkDirectory extends SharkFile
 			}
 		}
 		return null;
+	}
+
+	public void recursiveList(String prepend)
+	{
+		try
+		{
+			for(SharkFile child : this.getChildren())
+			{
+				System.out.print("\n" + prepend + child.getLocalName());
+				if(child.shared)
+				{
+					System.out.print(" (Shared, not actually on the server)");
+				}
+				if(child instanceof SharkDirectory)
+				{
+					((SharkDirectory) child).recursiveList(prepend + "  ");
+				}
+			}
+		}
+		catch(SharkException e)
+		{
+			System.out.print(" " + e.getMessage());
+		}
 	}
 }

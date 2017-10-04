@@ -26,15 +26,19 @@ The file names are hashed using MD5. Because the folder and file names are not c
 
 ### Browse a Repository
 
-Shark Repositories are mostly just binary files, so pretty much everything should be capable of hosting one.
+Shark Repositories are mostly just binary files, so pretty much everything should be capable of hosting one, so a Shark Repository might be available via HTTP, like the example we will use throughout this guide (`https://timmyrs.de/shark-repository/`).
 
-A Shark Repository might be available via HTTP (example: `https://timmyrs.de/shark-repository/`) so in order to list all files for that example URL you just run the following:
+First of all we will _connect_ to the Shark Repository as follows:
 
-	java -jar shark.jar browse https://timmyrs.de/shark-repository/ --list
+	java -jar shark.jar connect https://timmyrs.de/shark-repository/
 
-#### Downloading
+#### File Hierarchy
 
-If you want to download an entire repository, that's usually pretty simple, because all the contents are in a sub-folder, as `--list` will show us.
+In order to see all files in a repository, we just input `ls`, `list` or `tree` in the console.
+
+	$ ls
+
+Resulting in a response like this:
 
 	https://timmyrs.de/shark-repository
 	  shark-repository-public.txt
@@ -42,35 +46,33 @@ If you want to download an entire repository, that's usually pretty simple, beca
 	  shark-repository/
 	  	actual-content.txt
 
-In this case the Shark Repository is called `shark-repository`.
+As you might be able to tell, the actual content is in a subdirectory which has the same name as the Shark Repository, which brings us to...
 
-If you want **to download everything**, you can run:
+#### Downloading
 
-	java -jar shark.jar browse https://timmyrs.de/shark-repository/ --download-as-is shark-repository
+Downloading is pretty simple. You can just input `dl` or `download` in the console, followed by the path of a file or directory. All downloads will be stored in the current working directory.
 
-which will create a shark-repository folder in the current working directory and then download & decrypt the contents.
+Since we know that the actual content is in a folder called `shark-repository`, we can easially download everything as follows:
 
-If you want **to download a single file**, you can run:
+	$ dl shark-repository
 
-	java -jar shark.jar browse https://timmyrs.de/shark-repository/ --download shark-repository/actual-content.txt
+...but if we only care about the `actual-content.txt`, we can download it as follows:
 
-Which will just download the `actual-content.txt` into the current working directory.
-
-**Pro Tip:** You can replace `--download` with `-dl`.
+	$ dl shark-repository/actual-content.txt
 
 ### Creating a Repository
 
 Creating a new Shark Repository, is as simple as 1, 2, 3:
 
-1. `mkdir shark-repository` Create a directory. In this case the Shark Repository is called `shark-repository`.
+1. **Create a directory.** `mkdir shark-repository`. In this case the Shark Repository is called `shark-repository`.
 
-2. Fill your Shark Repository with data. **Note:** Avoid duplicate file name, because Shark saves everything as `.bin`!
+2. Fill your Shark Repository with data. **Note:** Avoid duplicate file name, because Shark saves everything as `.bin`, so `hi.txt` would overwrite `hi.csv`!
 
-3. `java -jar shark.jar build shark-repository` To encrypt it and make it server-ready. This will create the `shark-repository-built` which you can upload to any hoster and the `shark-repository-public.txt` which grants access to the data.
+3. **Encrypt it.** `java -jar shark.jar build shark-repository`. This will create the `shark-repository-built` folderm which you can upload to any hosterm and the `shark-repository-public.txt` which has to be present in the working directory for you to be able to access the data.
 
-Let's say you uploaded it on your webserver which runs under timmyrs.de and you've renamed the folder to `shark-repository` for simplicity, then you could give everyone you want to access that data the URL `https://timmyrs.de/shark-repository/` and the `shark-repository-public.txt`.
+Let's say you uploaded it on your webserver which runs under timmyrs.de and you've renamed `shark-repository-built` to `shark-repository` for simplicity, then you could give everyone you want to access that data the URL (`https://timmyrs.de/shark-repository/`) and the `shark-repository-public.txt`.
 
-As you might have noticed, to list the contents on `https://timmyrs.de/shark-repository/` you did not need to provide this key, this is because by default the `*-public.txt` is a _shared_ file, as you can see by looking at the `6a992d5529f459a44fee58c733255e86.bin` (`index.json`).
+**Nerd Bonus:** As you might've noticed, you could `ls` and `dl` from `https://timmyrs.de/shark-repository/` without having the `shark-reposity-public.txt`. This is because the `built` makes the public key a shared file by default, but you can change that in the `6a992d5529f459a44fee58c733255e86.bin` (`index.json`).
 
 ## Questions? Ideas? Bugs?!
 

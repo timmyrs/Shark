@@ -1,6 +1,9 @@
 package shark.Shark;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import shark.Shark.files.SharkDirectory;
 import shark.Shark.files.SharkFile;
 
@@ -20,7 +23,7 @@ import java.util.Base64;
 
 public class Main
 {
-	public static Gson GSON = new Gson();
+	private static Gson GSON = new Gson();
 	public static String REPOSITORY_URL;
 	public static SharkDirectory REPOSITORY;
 
@@ -35,17 +38,13 @@ public class Main
 		}
 		switch(args[0].toLowerCase())
 		{
+			case "connect":
+			case "console":
 			case "browse":
-				if(args.length < 3)
+				if(args.length < 2)
 				{
-					System.out.println("Syntax: java -jar shark.jar browse <repository-url> <action>");
-					System.out.println("");
-					System.out.println("Possible Actions:");
-					System.out.println("--list                  Recursively lists all files in the repository.");
-					System.out.println("--read <path>           Shows the content of the file at the given path.");
-					System.out.println("--read-binary <path>    Shows the binary data of the file at the given path.");
-					System.out.println("-dl, --download <path>  Downloads the given file into the current working directory.");
-					System.out.println("--download-as-is <path> Downloads the given file into the same relative directory as it is in the repository.");
+					System.out.println("Syntax: java -jar shark.jar browse <repository-url> [command]\n");
+					SharkConsole.executeCommand(new String[]{"help"});
 					return;
 				}
 				REPOSITORY_URL = args[1];
@@ -54,154 +53,46 @@ public class Main
 					REPOSITORY_URL = REPOSITORY_URL.substring(0, REPOSITORY_URL.length() - 1);
 				}
 				REPOSITORY = (SharkDirectory) SharkFile.construct("", "/dir", "", "", "");
-				SharkFile file;
-				switch(args[2].toLowerCase())
+				System.out.println("\nConnected to " + REPOSITORY_URL);
+				System.out.println("Type 'help' for a list of commands.");
+				if(args.length > 2)
 				{
-					default:
-						System.out.println("Unknown Argument: " + args[2]);
-						return;
-
-					case "--list":
-						System.out.print("\n" + REPOSITORY_URL);
-						recursiveList(REPOSITORY, "  ");
-						System.out.print("\n");
-						break;
-
-					case "--read":
-						if(args.length != 4)
-						{
-							System.out.println("Syntax: java -jar shark.jar browse <repository-url> --read <path>");
-						}
-						try
-						{
-							file = REPOSITORY.resolveRelativePath(args[3]);
-							if(file == null)
-							{
-								System.out.println(args[3] + " doesn't exist.");
-							}
-							else
-							{
-								System.out.println("\n" + file.getLocalName() + "\n");
-								try
-								{
-									System.out.println(file.getPlainContent());
-								}
-								catch(SharkException e)
-								{
-									e.printStackTrace(file.getLocalName() + ": ");
-								}
-							}
-						}
-						catch(SharkException e)
-						{
-							e.printStackTrace();
-						}
-						break;
-
-					case "--read-binary":
-						if(args.length != 4)
-						{
-							System.out.println("Syntax: java -jar shark.jar browse <repository-url> --read-binary <path>");
-						}
-						try
-						{
-							file = REPOSITORY.resolveRelativePath(args[3]);
-							if(file == null)
-							{
-								System.out.println(args[3] + " doesn't exist.");
-							}
-							else
-							{
-								System.out.println("\n" + file.getLocalName() + "\n");
-								int i = 0;
-								try
-								{
-									for(byte b : file.getBinaryContent())
-									{
-										System.out.printf("%02x ", b);
-										if(++i == 10)
-										{
-											System.out.print("\n");
-											i = 0;
-										}
-									}
-								}
-								catch(SharkException e)
-								{
-									e.printStackTrace(file.getLocalName() + ": ");
-								}
-								if(i > 0)
-								{
-									System.out.print("\n");
-								}
-							}
-						}
-						catch(SharkException e)
-						{
-							e.printStackTrace();
-						}
-						break;
-
-					case "-dl":
-					case "--download":
-						if(args.length != 4)
-						{
-							System.out.println("Syntax: java -jar shark.jar browse <repository-url> --download <path>");
-							return;
-						}
-						try
-						{
-							file = REPOSITORY.resolveRelativePath(args[3]);
-							if(file == null)
-							{
-								System.out.println(args[3] + " doesn't exist.");
-							}
-							else
-							{
-								long millis = System.currentTimeMillis();
-								file.downloadTo(Paths.get(file.getLocalName()));
-								System.out.print(" Downloaded & decrypted in " + millis + "ms.");
-							}
-						}
-						catch(SharkException e)
-						{
-							e.printStackTrace();
-						}
-						break;
-
-					case "--download-as-is":
-						if(args.length < 4)
-						{
-							System.out.println("Syntax: java -jar shark.jar browse <repository-url> --download-as-is <path>");
-							return;
-						}
-						try
-						{
-							file = REPOSITORY.resolveRelativePath(args[3]);
-							if(file == null)
-							{
-								System.out.println(args[3] + " doesn't exist.");
-							}
-							else
-							{
-								System.out.print("\n");
-								if(file instanceof SharkDirectory)
-								{
-									recursiveDownload(file, "");
-								}
-								else
-								{
-									System.out.print(file.path);
-									recursiveDownload(file, "  ");
-								}
-								System.out.print("\n");
-							}
-						}
-						catch(SharkException e)
-						{
-							e.printStackTrace();
-						}
+					String command = String.join(" ", args).substring(args[0].length() + args[1].length() + 2);
+					System.out.println("\n$ " + command + "\n");
+					SharkConsole.executeCommand(command.split(" "));
 				}
+				int b = -1;
+				do
+				{
+					if(System.in.available() > 0)
+					{
+						if(b == -1)
+						{
+							b = System.in.read();
+						}
+						byte[] inArr = new byte[System.in.available() + 1];
+						inArr[0] = (byte) b;
+						int d = 0;
+						for(int i = System.in.available(); i > 0; i--)
+						{
+							inArr[++d] = (byte) System.in.read();
+						}
+						String input = new String(inArr, "UTF-8");
+						System.out.print("\n");
+						if(input.startsWith("exit") || input.startsWith("end") || input.startsWith("disconnect"))
+						{
+							System.out.println("Goodbye.");
+							break;
+						}
+						SharkConsole.executeCommand(input.trim().split(" "));
+						b = -1;
+					}
+					else
+					{
+						System.out.print("\n$ ");
+						b = System.in.read();
+					}
+				} while(true);
 				break;
 
 			case "build":
@@ -372,7 +263,7 @@ public class Main
 					Files.copy(inputStream, Paths.get(outputFile.getPath() + "/" + name + ".bin"));
 					System.out.println(" Done in " + (System.currentTimeMillis() - millis) + "ms.");
 				}
-				fileObj.addProperty("type", file.getName().substring(file.getName().split("\\.")[0].length()+1));
+				fileObj.addProperty("type", file.getName().substring(file.getName().split("\\.")[0].length() + 1));
 			}
 			fileObj.addProperty("use", "aes-key");
 			array.add(fileObj);
@@ -436,54 +327,6 @@ public class Main
 		if(!folder.delete())
 		{
 			System.out.println("Failed to delete " + folder.getAbsolutePath());
-		}
-	}
-
-	private static void recursiveDownload(SharkFile file, String prepend)
-	{
-		try
-		{
-			System.out.print("\n" + prepend + file.getLocalName());
-			if(file instanceof SharkDirectory)
-			{
-				for(SharkFile child : ((SharkDirectory) file).getChildren())
-				{
-					recursiveDownload(child, prepend + "  ");
-				}
-			}
-			else
-			{
-				long millis = System.currentTimeMillis();
-				file.downloadTo(Paths.get(System.getProperty("user.dir") + file.localpath + file.getLocalName()));
-				System.out.print(": Downloaded & decrypted in " + (System.currentTimeMillis() - millis) + "ms.");
-			}
-		}
-		catch(SharkException e)
-		{
-			System.out.print(": " + e.getMessage());
-		}
-	}
-
-	private static void recursiveList(SharkDirectory directory, String prepend)
-	{
-		try
-		{
-			for(SharkFile file : directory.getChildren())
-			{
-				System.out.print("\n" + prepend + file.getLocalName());
-				if(file.shared)
-				{
-					System.out.print(" (Shared, not actually on the server)");
-				}
-				if(file instanceof SharkDirectory)
-				{
-					recursiveList((SharkDirectory) file, prepend + "  ");
-				}
-			}
-		}
-		catch(SharkException e)
-		{
-			System.out.print(" " + e.getMessage());
 		}
 	}
 }

@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -20,10 +21,10 @@ public class SharkFile
 {
 	final String name;
 	private final String type;
-	public final String path;
+	final String path;
 	public final String localpath;
 	private final String use;
-	public final boolean shared;
+	final boolean shared;
 	private byte[] content;
 
 	SharkFile(String name, String type, String path, String localpath, String use, boolean shared)
@@ -175,7 +176,8 @@ public class SharkFile
 			content = new byte[]{};
 			if(!this.shared)
 			{
-				throw new SharkException("The repository doesn't know " + this.path + this.getLocalName() + ".");
+				e.printStackTrace();
+				throw new SharkException("The repository doesn't know " + this.getLocalName() + ".");
 			}
 		}
 		if(!this.use.equals(""))
@@ -198,14 +200,39 @@ public class SharkFile
 		return content;
 	}
 
-	public void downloadTo(Path path) throws SharkException
+	public void recursiveDownload(String prepend, String localpath)
+	{
+		try
+		{
+			System.out.print("\n" + prepend + this.getLocalName());
+			if(this instanceof SharkDirectory)
+			{
+				for(SharkFile child : ((SharkDirectory) this).getChildren())
+				{
+					child.recursiveDownload(prepend + "  ", localpath + this.getLocalName());
+				}
+			}
+			else
+			{
+				long millis = System.currentTimeMillis();
+				this.downloadTo(Paths.get(System.getProperty("user.dir") + "/" + localpath + this.getLocalName()));
+				System.out.print(": Downloaded & decrypted in " + (System.currentTimeMillis() - millis) + "ms.");
+			}
+		}
+		catch(SharkException e)
+		{
+			System.out.print(": " + e.getMessage());
+		}
+	}
+
+	private void downloadTo(Path path) throws SharkException
 	{
 		File file = path.toFile();
 		if(file.exists())
 		{
 			throw new SharkException("File already exists locally.");
 		}
-		if(!file.getParentFile().exists())
+		if(file.getParentFile() != null && !file.getParentFile().exists())
 		{
 			if(!file.getParentFile().mkdirs())
 			{
