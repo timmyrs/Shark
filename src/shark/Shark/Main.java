@@ -77,14 +77,17 @@ public class Main
 						{
 							inArr[++d] = (byte) System.in.read();
 						}
-						String input = new String(inArr, "UTF-8");
-						System.out.print("\n");
-						if(input.startsWith("exit") || input.startsWith("end") || input.startsWith("disconnect"))
+						String input = new String(inArr, "UTF-8").trim();
+						if(!input.equals(""))
 						{
-							System.out.println("Goodbye.");
-							break;
+							System.out.print("\n");
+							if(input.startsWith("exit") || input.startsWith("end") || input.startsWith("disconnect"))
+							{
+								System.out.println("Goodbye.");
+								break;
+							}
+							executeCommand(input);
 						}
-						executeCommand(input.trim());
 						b = -1;
 					}
 					else
