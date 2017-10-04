@@ -23,7 +23,7 @@ public class SharkFile
 	public final String path;
 	public final String localpath;
 	private final String use;
-	private final boolean shared;
+	public final boolean shared;
 	private byte[] content;
 
 	SharkFile(String name, String type, String path, String localpath, String use, boolean shared)

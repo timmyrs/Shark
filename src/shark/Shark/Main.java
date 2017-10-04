@@ -32,6 +32,7 @@ public class Main
 		{
 			System.out.println("java -jar shark.jar browse  Browse a Repository");
 			System.out.println("java -jar shark.jar build   Create a Repository");
+			System.out.println("\nDocumentation: https://github.com/timmyrs/Shark/blob/master/README.md");
 			return;
 		}
 		switch(args[0].toLowerCase())
@@ -82,6 +83,7 @@ public class Main
 							}
 							else
 							{
+								System.out.println("\n" + file.getLocalName() + "\n");
 								try
 								{
 									System.out.println(file.getPlainContent());
@@ -112,6 +114,7 @@ public class Main
 							}
 							else
 							{
+								System.out.println("\n" + file.getLocalName() + "\n");
 								int i = 0;
 								try
 								{
@@ -251,15 +254,15 @@ public class Main
 						publicKey = kp.getPublic();
 						privateKey = kp.getPrivate();
 						FileWriter writer = new FileWriter(publicKeyFile);
-						writer.write("-----BEGIN PRIVATE KEY-----\n");
+						writer.write("-----BEGIN PUBLIC KEY-----\n");
 						writer.write(new String(Base64.getEncoder().encode(publicKey.getEncoded()), "UTF-8"));
-						writer.write("\n-----END PRIVATE KEY-----");
+						writer.write("\n-----END PUBLIC KEY-----");
 						writer.flush();
 						writer.close();
 						writer = new FileWriter(privateKeyFile);
-						writer.write("-----BEGIN PUBLIC KEY-----\n");
+						writer.write("-----BEGIN PRIVATE KEY-----\n");
 						writer.write(new String(Base64.getEncoder().encode(privateKey.getEncoded()), "UTF-8"));
-						writer.write("\n-----END PUBLIC KEY-----");
+						writer.write("\n-----END PRIVATE KEY-----");
 						writer.flush();
 						writer.close();
 					}
@@ -314,7 +317,7 @@ public class Main
 						outputStream.flush();
 						outputStream.close();
 					}
-					recursivelyMove(inputFile, outputFile, aesKey);
+					recursivelyCopy(inputFile, outputFile, aesKey);
 					System.out.println("\n" + inputFileName + " has been built.\n");
 					System.out.println("You may now move the " + inputFileName + "-built folder on a webserver, optionally rename it and then");
 					System.out.println("everyone with the full path and " + keyFileName + "-public.txt can access your repository.\n");
@@ -326,7 +329,7 @@ public class Main
 		}
 	}
 
-	private static void recursivelyMove(File inputFile, File outputFile, byte[] aesKey) throws IOException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException
+	private static void recursivelyCopy(File inputFile, File outputFile, byte[] aesKey) throws IOException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException
 	{
 		JsonArray array = new JsonArray();
 		//noinspection ConstantConditions
@@ -349,7 +352,7 @@ public class Main
 					}
 					else
 					{
-						recursivelyMove(file, outFile, aesKey);
+						recursivelyCopy(file, outFile, aesKey);
 					}
 				}
 				else
@@ -371,7 +374,7 @@ public class Main
 					Files.copy(inputStream, Paths.get(outputFile.getPath() + "/" + name + ".bin"));
 					System.out.println(" Done in " + (System.currentTimeMillis() - millis) + "ms.");
 				}
-				fileObj.addProperty("type", file.getName().split("\\.")[1]);
+				fileObj.addProperty("type", file.getName().substring(file.getName().split("\\.")[0].length()+1));
 			}
 			fileObj.addProperty("use", "aes-key");
 			array.add(fileObj);
@@ -470,6 +473,10 @@ public class Main
 			for(SharkFile file : directory.getChildren())
 			{
 				System.out.print("\n" + prepend + file.getLocalName());
+				if(file.shared)
+				{
+					System.out.print(" (Shared, not actually on the server)");
+				}
 				if(file instanceof SharkDirectory)
 				{
 					recursiveList((SharkDirectory) file, prepend + "  ");
