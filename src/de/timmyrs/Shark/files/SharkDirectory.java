@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import de.timmyrs.Shark.Main;
 import de.timmyrs.Shark.SharkException;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class SharkDirectory extends SharkFile
 		index = SharkFile.construct("index", "json", this.path + this.getRemoteName() + "/", this.localpath + this.getLocalName() + "/", use);
 	}
 
-	ArrayList<SharkFile> getChildren() throws SharkException
+	public ArrayList<SharkFile> getChildren() throws SharkException
 	{
 		if(children == null)
 		{
@@ -45,7 +46,18 @@ public class SharkDirectory extends SharkFile
 		String[] pathArr = path.split("/");
 		if(pathArr.length == 0 || pathArr[0].equals(""))
 		{
-			return this;
+			return this.resolveRelativePath(path.substring(pathArr[0].length() + 1));
+		}
+		if(pathArr[0].equals(".."))
+		{
+			if(Main.REPOSITORY == this)
+			{
+				return this.resolveRelativePath(path.substring(pathArr[0].length() + 1));
+			}
+			else
+			{
+				return resolveParent(Main.REPOSITORY);
+			}
 		}
 		for(SharkFile file : this.getChildren())
 		{
@@ -65,6 +77,29 @@ public class SharkDirectory extends SharkFile
 				else
 				{
 					return file;
+				}
+			}
+		}
+		return null;
+	}
+
+	private SharkDirectory resolveParent(SharkDirectory possibleParent) throws SharkException
+	{
+		for(SharkFile child : possibleParent.getChildren())
+		{
+			if(child instanceof SharkDirectory)
+			{
+				if(child == this)
+				{
+					return possibleParent;
+				}
+				else
+				{
+					SharkDirectory parent = resolveParent((SharkDirectory) child);
+					if(parent != null)
+					{
+						return parent;
+					}
 				}
 			}
 		}

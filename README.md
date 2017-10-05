@@ -62,15 +62,15 @@ Since we know that the actual content is in a folder called `shark-repository`, 
 
 ### Creating a Repository
 
-Creating a new Shark Repository, is as simple as 1, 2, 3:
+Creating a new Shark Repository is as simple as 1, 2, 3:
 
 1. **Create a directory.** `mkdir shark-repository`. In this case the Shark Repository is called `shark-repository`.
 
 2. Fill your Shark Repository with data. **Note:** Avoid duplicate file name, because Shark saves everything as `.bin`, so `hi.txt` would overwrite `hi.csv`!
 
-3. **Encrypt it.** `java -jar shark.jar build shark-repository`. This will create the `shark-repository-built` folderm which you can upload to any hosterm and the `shark-repository-public.txt` which has to be present in the working directory for you to be able to access the data.
+3. **Encrypt it.** `java -jar shark.jar build shark-repository`. This will create the `shark-repository-built` folder which you can upload to any hosterm and the `shark-repository-public.txt` which has to be present in the working directory for you to be able to access the data.
 
-Let's say you uploaded it on your webserver which runs under timmyrs.de and you've renamed `shark-repository-built` to `shark-repository` for simplicity, then you could give everyone you want to access that data the URL (`https://timmyrs.de/shark-repository/`) and the `shark-repository-public.txt`.
+Let's say you've uploaded it on your web server which runs under timmyrs.de and renamed it to `shark-repository` for simplicity, then you could give everyone you want to access that data the URL (`https://timmyrs.de/shark-repository/`) and the `shark-repository-public.txt`.
 
 **Nerd Bonus:** As you might've noticed, you could `ls` and `dl` from `https://timmyrs.de/shark-repository/` without having the `shark-reposity-public.txt`. This is because the `built` makes the public key a shared file by default, but you can change that in the `6a992d5529f459a44fee58c733255e86.bin` (`index.json`).
 

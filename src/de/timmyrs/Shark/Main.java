@@ -27,6 +27,7 @@ public class Main
 	public static boolean DEBUG = false;
 	public static String REPOSITORY_URL;
 	public static SharkDirectory REPOSITORY;
+	private static String USER_CD_PATH = "";
 
 	public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, IOException, InvalidAlgorithmParameterException, ClassNotFoundException
 	{
@@ -212,8 +213,8 @@ public class Main
 					}
 					recursivelyCopy(inputFile, outputFile, aesKey);
 					System.out.println("\n" + inputFileName + " has been built.\n");
-					System.out.println("You may now move the " + inputFileName + "-built folder on a webserver, optionally rename it and then");
-					System.out.println("everyone with the full path and " + keyFileName + "-public.txt can access your repository.\n");
+					System.out.println("You may now move the " + inputFileName + "-built folder on a web server, optionally rename it and then");
+					System.out.println("everyone with the full path and " + keyFileName + "-public.txt can access your repository.");
 				}
 				break;
 
@@ -233,6 +234,7 @@ public class Main
 		{
 			args = new String[]{input};
 		}
+		SharkDirectory parent;
 		switch(args[0].toLowerCase())
 		{
 			case "debug":
@@ -248,11 +250,92 @@ public class Main
 				}
 				break;
 
+			case "cd":
+				if(args.length > 1)
+				{
+					if(args[1].equals("/"))
+					{
+						USER_CD_PATH = "";
+					}
+					else if(args[1].startsWith("/"))
+					{
+						args[1] = args[1].substring(1);
+					}
+					try
+					{
+						SharkFile target = REPOSITORY.resolveRelativePath(USER_CD_PATH + args[1]);
+						if(target instanceof SharkDirectory)
+						{
+							USER_CD_PATH = target.localpath + target.getLocalName();
+						}
+						else
+						{
+							System.out.println("You can't cd into file.");
+						}
+					}
+					catch(SharkException e)
+					{
+						e.printStackTrace();
+					}
+					if(USER_CD_PATH.startsWith("/"))
+					{
+						USER_CD_PATH = USER_CD_PATH.substring(1);
+					}
+				}
+				System.out.println("You are operating in '" + USER_CD_PATH + "'.");
+				break;
+
 			case "ls":
-			case "list":
+				parent = Main.REPOSITORY;
+				try
+				{
+					if(args.length > 1)
+					{
+						parent = (SharkDirectory) Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[1]);
+					}
+					else
+					{
+						parent = (SharkDirectory) Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[0]);
+					}
+				}
+				catch(SharkException e)
+				{
+					e.printStackTrace();
+				}
+				System.out.print(parent.localpath + parent.getLocalName());
+				try
+				{
+					for(SharkFile child : parent.getChildren())
+					{
+						System.out.print("\n  " + child.getLocalName());
+					}
+				}
+				catch(SharkException e)
+				{
+					e.printStackTrace();
+				}
+				System.out.print("\n");
+				break;
+
 			case "tree":
-				System.out.print(Main.REPOSITORY_URL);
-				Main.REPOSITORY.recursiveList("  ");
+				parent = Main.REPOSITORY;
+				try
+				{
+					if(args.length > 1)
+					{
+						parent = (SharkDirectory) Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[1]);
+					}
+					else
+					{
+						parent = (SharkDirectory) Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[0]);
+					}
+				}
+				catch(SharkException e)
+				{
+					e.printStackTrace();
+				}
+				System.out.print(parent.localpath + parent.getLocalName());
+				parent.recursiveList("  ");
 				System.out.print("\n");
 				break;
 
@@ -263,7 +346,7 @@ public class Main
 				}
 				try
 				{
-					SharkFile file = Main.REPOSITORY.resolveRelativePath(args[1]);
+					SharkFile file = Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[1]);
 					if(file == null)
 					{
 						System.out.println(args[1] + " doesn't exist.");
@@ -293,7 +376,7 @@ public class Main
 				}
 				try
 				{
-					SharkFile file = Main.REPOSITORY.resolveRelativePath(args[1]);
+					SharkFile file = Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[1]);
 					if(file == null)
 					{
 						System.out.println(args[1] + " doesn't exist.");
@@ -338,7 +421,7 @@ public class Main
 				}
 				try
 				{
-					SharkFile file = Main.REPOSITORY.resolveRelativePath(args[1]);
+					SharkFile file = Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[1]);
 					if(file == null)
 					{
 						System.out.println(args[1] + " doesn't exist.");
