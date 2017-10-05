@@ -176,8 +176,11 @@ public class SharkFile
 			content = new byte[]{};
 			if(!this.shared)
 			{
-				e.printStackTrace();
-				throw new SharkException("The repository doesn't know " + this.getLocalName() + ".");
+				if(Main.DEBUG)
+				{
+					e.printStackTrace();
+				}
+				throw new SharkException("The repository doesn't want to give you " + this.getLocalName() + ".");
 			}
 		}
 		if(!this.use.equals(""))

@@ -24,6 +24,7 @@ import java.util.Base64;
 public class Main
 {
 	private static Gson GSON = new Gson();
+	public static boolean DEBUG = false;
 	public static String REPOSITORY_URL;
 	public static SharkDirectory REPOSITORY;
 
@@ -234,6 +235,19 @@ public class Main
 		}
 		switch(args[0].toLowerCase())
 		{
+			case "debug":
+				if(DEBUG)
+				{
+					DEBUG = false;
+					System.out.println("No longer in debug mode.");
+				}
+				else
+				{
+					DEBUG = true;
+					System.out.println("Now in debug mode.");
+				}
+				break;
+
 			case "ls":
 			case "list":
 			case "tree":
