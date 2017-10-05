@@ -1,7 +1,7 @@
-package shark.Shark.files;
+package de.timmyrs.Shark.files;
 
-import shark.Shark.Main;
-import shark.Shark.SharkException;
+import de.timmyrs.Shark.Main;
+import de.timmyrs.Shark.SharkException;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;

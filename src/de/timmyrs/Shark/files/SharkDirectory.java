@@ -1,10 +1,10 @@
-package shark.Shark.files;
+package de.timmyrs.Shark.files;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import shark.Shark.SharkException;
+import de.timmyrs.Shark.SharkException;
 
 import java.util.ArrayList;
 

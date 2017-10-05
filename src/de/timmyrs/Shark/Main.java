@@ -1,11 +1,11 @@
-package shark.Shark;
+package de.timmyrs.Shark;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import shark.Shark.files.SharkDirectory;
-import shark.Shark.files.SharkFile;
+import de.timmyrs.Shark.files.SharkDirectory;
+import de.timmyrs.Shark.files.SharkFile;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;

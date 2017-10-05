@@ -1,4 +1,4 @@
-package shark.Shark;
+package de.timmyrs.Shark;
 
 public class SharkException extends Exception
 {
@@ -13,7 +13,7 @@ public class SharkException extends Exception
 		this.printStackTrace("");
 	}
 
-	public void printStackTrace(String prepend)
+	void printStackTrace(String prepend)
 	{
 		System.out.println(prepend + this.getMessage());
 	}
