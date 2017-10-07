@@ -101,16 +101,59 @@ public class Main
 				break;
 
 			case "build":
-				if(args.length != 2)
+				if(args.length < 2)
 				{
-					System.out.println("Syntax: java -jar shark.jar build <directory>");
+					System.out.println("Syntax: java -jar shark.jar build <directory> [options]");
+					System.out.println("\nOptions:");
+					System.out.println("--output <directory>   Sets the output directory.");
 				}
 				else
 				{
 					String inputFileName = args[1];
-					if(inputFileName.substring(inputFileName.length() - 1).equals("/"))
+					if(args.length > 2)
+					{
+						String nextArg = "";
+						int i = 0;
+						for(String arg : args)
+						{
+							if(i++ < 2)
+							{
+								continue;
+							}
+							if(nextArg.equals("output"))
+							{
+								SharkBuildOptions.output = arg;
+								nextArg = "";
+							}
+							else
+							{
+								if(arg.equalsIgnoreCase("--output"))
+								{
+									nextArg = "output";
+								}
+								else
+								{
+									System.out.println("Unknown Argument: " + arg);
+								}
+							}
+						}
+						if(!nextArg.equals(""))
+						{
+							System.out.println("Missing Argument.");
+							return;
+						}
+					}
+					if(inputFileName.endsWith("/"))
 					{
 						inputFileName = inputFileName.substring(0, inputFileName.length() - 1);
+					}
+					if(SharkBuildOptions.output == null)
+					{
+						SharkBuildOptions.output = inputFileName + "-built";
+					}
+					else if(SharkBuildOptions.output.endsWith("/"))
+					{
+						SharkBuildOptions.output = SharkBuildOptions.output.substring(0, SharkBuildOptions.output.length() - 1);
 					}
 					File inputFile = new File(inputFileName);
 					if(!inputFile.exists() || !inputFile.isDirectory())
@@ -124,6 +167,7 @@ public class Main
 					File privateKeyFile = new File(privateKeyFileName);
 					Key publicKey;
 					PrivateKey privateKey;
+					boolean generatedKeys = false;
 					if(publicKeyFile.exists() && privateKeyFile.exists())
 					{
 						System.out.println("Loading RSA Keypair...");
@@ -159,11 +203,12 @@ public class Main
 						writer.write("\n-----END PRIVATE KEY-----");
 						writer.flush();
 						writer.close();
+						generatedKeys = true;
 					}
 					System.out.println("Preparing Repository...");
 					MessageDigest md = MessageDigest.getInstance("MD5");
 					String name = String.format("%032x", new BigInteger(1, md.digest(inputFileName.getBytes("UTF-8"))));
-					File outputFile = new File(inputFileName + "-built/" + name);
+					File outputFile = new File(SharkBuildOptions.output + "/" + name);
 					if(!outputFile.exists() || !outputFile.isDirectory())
 					{
 						if(!outputFile.mkdirs())
@@ -193,7 +238,7 @@ public class Main
 					writer.close();
 					byte[] aesKey;
 					File aesKeyFile = new File(outputFile.getParentFile().getPath() + "/3f0fac6f871d37b7cbea85d4e3910099.bin");
-					if(aesKeyFile.exists())
+					if(aesKeyFile.exists() && !generatedKeys)
 					{
 						System.out.println("Reading AES Key...");
 						Cipher cipher = Cipher.getInstance("RSA");
@@ -203,6 +248,14 @@ public class Main
 					else
 					{
 						System.out.println("Generating AES Key...");
+						if(aesKeyFile.exists())
+						{
+							if(!aesKeyFile.delete())
+							{
+								System.out.println("Failed to delete " + aesKeyFile.getPath());
+								return;
+							}
+						}
 						Cipher cipher = Cipher.getInstance("RSA");
 						cipher.init(Cipher.ENCRYPT_MODE, privateKey);
 						aesKey = KeyGenerator.getInstance("AES").generateKey().getEncoded();
@@ -213,7 +266,7 @@ public class Main
 					}
 					recursivelyCopy(inputFile, outputFile, aesKey);
 					System.out.println("\n" + inputFileName + " has been built.\n");
-					System.out.println("You may now move the " + inputFileName + "-built folder on a web server, optionally rename it and then");
+					System.out.println("You may now move the " + SharkBuildOptions.output + " folder on a web server, optionally rename it and then");
 					System.out.println("everyone with the full path and " + keyFileName + "-public.txt can access your repository.");
 				}
 				break;
