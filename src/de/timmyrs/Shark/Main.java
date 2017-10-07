@@ -27,7 +27,7 @@ public class Main
 	public static boolean DEBUG = false;
 	public static String REPOSITORY_URL;
 	public static SharkDirectory REPOSITORY;
-	private static String USER_CD_PATH = "";
+	static String USER_CD_PATH = "";
 
 	public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, IOException, InvalidAlgorithmParameterException, ClassNotFoundException
 	{
@@ -276,7 +276,7 @@ public class Main
 		}
 	}
 
-	private static void executeCommand(String input)
+	static void executeCommand(String input)
 	{
 		String[] args;
 		if(input.contains(" "))
@@ -348,7 +348,7 @@ public class Main
 					}
 					else
 					{
-						parent = (SharkDirectory) Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[0]);
+						parent = (SharkDirectory) Main.REPOSITORY.resolveRelativePath(USER_CD_PATH);
 					}
 				}
 				catch(SharkException e)
@@ -380,7 +380,7 @@ public class Main
 					}
 					else
 					{
-						parent = (SharkDirectory) Main.REPOSITORY.resolveRelativePath(USER_CD_PATH + args[0]);
+						parent = (SharkDirectory) Main.REPOSITORY.resolveRelativePath(USER_CD_PATH);
 					}
 				}
 				catch(SharkException e)
@@ -503,7 +503,9 @@ public class Main
 				System.out.println("Unknown Command '" + args[0].toLowerCase() + "'.\n");
 			case "help":
 				System.out.println("Commands:\n");
-				System.out.println("ls, list, tree        Recursively lists all files in the repository.");
+				System.out.println("cd                    Change the current directory.");
+				System.out.println("ls [path]             Lists all files in the current directory or path.");
+				System.out.println("tree [path]           Recursively lists all files in the current directory or path.");
 				System.out.println("cat <path>            Shows the content of the file at the given path.");
 				System.out.println("cat-bin <path>        Shows the binary data of the file at the given path.");
 				System.out.println("dl, download <path>   Downloads the given file or folder into the current working directory.");

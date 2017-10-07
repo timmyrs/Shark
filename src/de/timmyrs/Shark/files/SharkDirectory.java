@@ -44,9 +44,20 @@ public class SharkDirectory extends SharkFile
 	public SharkFile resolveRelativePath(String path) throws SharkException
 	{
 		String[] pathArr = path.split("/");
-		if(pathArr.length == 0 || pathArr[0].equals(""))
+		if(pathArr.length == 0)
 		{
-			return this.resolveRelativePath(path.substring(pathArr[0].length() + 1));
+			return this;
+		}
+		if(pathArr[0].equals(""))
+		{
+			if(path.length() > 1)
+			{
+				return Main.REPOSITORY.resolveRelativePath(path.substring(1));
+			}
+			else
+			{
+				return Main.REPOSITORY;
+			}
 		}
 		if(pathArr[0].equals(".."))
 		{

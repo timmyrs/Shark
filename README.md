@@ -34,17 +34,19 @@ First of all we will _connect_ to the Shark Repository as follows:
 
 #### File Hierarchy
 
-In order to see all files in a repository, we just input `ls`, `list` or `tree` in the console.
+In order to see all files in a repository, we just input `tree` in the console.
 
-	$ ls
+	$ tree
 
 Resulting in a response like this:
 
-	https://timmyrs.de/shark-repository
+	/
 	  shark-repository-public.txt
 	  aes-key.bin
 	  shark-repository/
 	  	actual-content.txt
+
+**Note:** There also is an `ls` command, but it does not list the content recursively.
 
 As you might be able to tell, the actual content is in a subdirectory which has the same name as the Shark Repository, which brings us to...
 
