@@ -59,7 +59,10 @@ public class SharkFile
 			return this.name;
 		}
 		String name = this.name;
-		name = name.split("\\.")[0];
+		if(!this.type.equals("/dir"))
+		{
+			name = name.split("\\.")[0];
+		}
 		try
 		{
 			MessageDigest md = MessageDigest.getInstance("MD5");
