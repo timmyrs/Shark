@@ -23,6 +23,8 @@ public class UnitTests
 		assertEquals("", Main.USER_CD_PATH);
 		Main.executeCommand("cd shark-repository");
 		assertEquals("shark-repository/", Main.USER_CD_PATH);
+		Main.executeCommand("cd .");
+		assertEquals("shark-repository/", Main.USER_CD_PATH);
 		Main.executeCommand("cd /");
 		assertEquals("", Main.USER_CD_PATH);
 		Main.executeCommand("cd shark-repository");

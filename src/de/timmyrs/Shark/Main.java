@@ -339,6 +339,7 @@ public class Main
 				break;
 
 			case "ls":
+			case "dir":
 				parent = Main.REPOSITORY;
 				try
 				{
@@ -503,13 +504,13 @@ public class Main
 				System.out.println("Unknown Command '" + args[0].toLowerCase() + "'.\n");
 			case "help":
 				System.out.println("Commands:\n");
-				System.out.println("cd                    Change the current directory.");
-				System.out.println("ls [path]             Lists all files in the current directory or path.");
-				System.out.println("tree [path]           Recursively lists all files in the current directory or path.");
-				System.out.println("cat <path>            Shows the content of the file at the given path.");
-				System.out.println("cat-bin <path>        Shows the binary data of the file at the given path.");
-				System.out.println("dl, download <path>   Downloads the given file or folder into the current working directory.");
-				System.out.println("exit, end, disconnect Ends the console session.");
+				System.out.println("cd                     Change the current directory.");
+				System.out.println("ls, dir [path]         Lists all files in the current directory or path.");
+				System.out.println("tree [path]            Recursively lists all files in the current directory or path.");
+				System.out.println("cat <path>             Shows the content of the file at the given path.");
+				System.out.println("cat-bin <path>         Shows the binary data of the file at the given path.");
+				System.out.println("dl, download <path>    Downloads the given file or folder into the current working directory.");
+				System.out.println("exit, end, disconnect  Ends the console session.");
 		}
 	}
 
