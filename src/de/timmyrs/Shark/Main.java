@@ -521,12 +521,12 @@ public class Main
 		for(File file : inputFile.listFiles())
 		{
 			JsonObject fileObj = new JsonObject();
-			fileObj.addProperty("name", file.getName().split("\\.")[0]);
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			String name;
 			if(file.isDirectory())
 			{
 				name = String.format("%032x", new BigInteger(1, md.digest(file.getName().getBytes("UTF-8"))));
+				fileObj.addProperty("name", file.getName());
 				fileObj.addProperty("type", "/dir");
 				File outFile = new File(outputFile.getPath() + "/" + name);
 				if((outFile.exists() && outFile.isDirectory()) || outFile.mkdir())
@@ -549,6 +549,7 @@ public class Main
 			else
 			{
 				name = String.format("%032x", new BigInteger(1, md.digest(file.getName().split("\\.")[0].getBytes("UTF-8"))));
+				fileObj.addProperty("name", file.getName().split("\\.")[0]);
 				File outFile = new File(outputFile.getPath() + "/" + name + ".bin");
 				if(!outFile.exists())
 				{
